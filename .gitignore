@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+.env.local
+.DS_Store
+bun.lock
+bun.lockb
+.aistudio
+public/assets/aistudio
