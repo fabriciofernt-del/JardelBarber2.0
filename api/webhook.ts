@@ -68,9 +68,6 @@ export default async function handler(req: any, res: any) {
     let emailData = null;
     if (resend) {
       const destinatarios = [EMAIL_DESTINO];
-      if (clienteEmail && typeof clienteEmail === 'string' && clienteEmail.includes('@')) {
-        destinatarios.push(clienteEmail.trim());
-      }
 
       try {
         const emailRes = await resend.emails.send({

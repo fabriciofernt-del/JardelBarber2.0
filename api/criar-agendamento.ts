@@ -288,9 +288,6 @@ export default async function handler(req: any, res: any) {
       `;
 
       const destinatarios = [EMAIL_DESTINO];
-      if (emailCliente && emailCliente.includes('@')) {
-        destinatarios.push(emailCliente);
-      }
 
       const { data: emailData, error: emailError } = await sendResendEmail({
         to: destinatarios,
@@ -388,9 +385,6 @@ export default async function handler(req: any, res: any) {
     `;
 
     const destinatarios = [EMAIL_DESTINO];
-    if (emailCliente && emailCliente.includes('@')) {
-      destinatarios.push(emailCliente);
-    }
 
     const { data: emailData, error: emailError } = await sendResendEmail({
       to: destinatarios,
