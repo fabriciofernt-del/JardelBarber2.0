@@ -5,7 +5,7 @@ dotenv.config({ path: '.env.local', override: true });
 dotenv.config({ override: true });
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
-const EMAIL_DESTINO = process.env.EMAIL_DESTINO || 'jardeldssbarbeiro@gmail.com';
+const EMAIL_DESTINO = process.env.EMAIL_DESTINO || 'contato@barbeariadojardel.com.br';
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
@@ -67,26 +67,15 @@ export default async function handler(req: any, res: any) {
     // --- 2. ENVIO DE E-MAIL (RESEND) COM FALLBACK ---
     let emailData = null;
     if (resend) {
+      const destinatarios = [EMAIL_DESTINO];
+      if (clienteEmail && typeof clienteEmail === 'string' && clienteEmail.includes('@')) {
+        destinatarios.push(clienteEmail.trim());
+      }
+
       try {
         const emailRes = await resend.emails.send({
-        from: 'Barbearia do Jardel <notificacoes@barbeariadojardel.com.br>',
-        to: [EMAIL_DESTINO],
-        subject: `Novo agendamento - ${nome}`,
-        html: `
-          <h2>Novo agendamento</h2>
-          <p><strong>Cliente:</strong> ${nome}</p>
-          <p><strong>Telefone:</strong> ${telefone || 'Não informado'}</p>
-          <p><strong>Serviço:</strong> ${servico || 'Serviço da Barbearia'}</p>
-          <p><strong>Data:</strong> ${dataAgendamento}</p>
-          <p><strong>Horário:</strong> ${hora}</p>
-        `
-      });
-
-      if (emailRes.error) {
-        console.warn('Erro domínio customizado no webhook, tentando onboarding@resend.dev');
-        emailData = await resend.emails.send({
-          from: 'Barbearia do Jardel <onboarding@resend.dev>',
-          to: [EMAIL_DESTINO],
+          from: 'Barbearia do Jardel <notificacoes@barbeariadojardel.com.br>',
+          to: destinatarios,
           subject: `Novo agendamento - ${nome}`,
           html: `
             <h2>Novo agendamento</h2>
@@ -97,9 +86,25 @@ export default async function handler(req: any, res: any) {
             <p><strong>Horário:</strong> ${hora}</p>
           `
         });
-      } else {
-        emailData = emailRes;
-      }
+
+        if (emailRes.error) {
+          console.warn('Erro domínio customizado no webhook, tentando onboarding@resend.dev');
+          emailData = await resend.emails.send({
+            from: 'Barbearia do Jardel <onboarding@resend.dev>',
+            to: destinatarios,
+            subject: `Novo agendamento - ${nome}`,
+            html: `
+              <h2>Novo agendamento</h2>
+              <p><strong>Cliente:</strong> ${nome}</p>
+              <p><strong>Telefone:</strong> ${telefone || 'Não informado'}</p>
+              <p><strong>Serviço:</strong> ${servico || 'Serviço da Barbearia'}</p>
+              <p><strong>Data:</strong> ${dataAgendamento}</p>
+              <p><strong>Horário:</strong> ${hora}</p>
+            `
+          });
+        } else {
+          emailData = emailRes;
+        }
       } catch (e) {
         console.error('Erro Resend no webhook:', e);
       }
