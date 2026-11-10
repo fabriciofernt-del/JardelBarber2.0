@@ -81,12 +81,12 @@ export const PublicBooking: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>(getNextAvailableDate());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   
-  // Controle de 4 horários para Pacotes Mensais
-  const [packageSlots, setPackageSlots] = useState<Array<{ date: string; time: string }>>([
-    { date: getNextAvailableDate(), time: '' },
-    { date: '', time: '' },
-    { date: '', time: '' },
-    { date: '', time: '' },
+  // Controle de 4 horários para Pacotes Mensais com suporte a ordem/tipo de serviço
+  const [packageSlots, setPackageSlots] = useState<Array<{ date: string; time: string; serviceId?: number; serviceName?: string }>>([
+    { date: getNextAvailableDate(), time: '', serviceId: 0, serviceName: '' },
+    { date: '', time: '', serviceId: 0, serviceName: '' },
+    { date: '', time: '', serviceId: 0, serviceName: '' },
+    { date: '', time: '', serviceId: 0, serviceName: '' },
   ]);
   const [activeSlotIndex, setActiveSlotIndex] = useState<number>(0);
 
@@ -227,11 +227,13 @@ export const PublicBooking: React.FC = () => {
     const d2 = getNextAvailableDateFrom(d1, 7);
     const d3 = getNextAvailableDateFrom(d2, 7);
     const d4 = getNextAvailableDateFrom(d3, 7);
+    const defId = selectedService?.id || availableServices[0]?.id || 1;
+    const defName = selectedService?.name || availableServices[0]?.name || 'Corte';
     setPackageSlots([
-      { date: d1, time: '' },
-      { date: d2, time: '' },
-      { date: d3, time: '' },
-      { date: d4, time: '' }
+      { date: d1, time: '', serviceId: defId, serviceName: defName },
+      { date: d2, time: '', serviceId: defId, serviceName: defName },
+      { date: d3, time: '', serviceId: defId, serviceName: defName },
+      { date: d4, time: '', serviceId: defId, serviceName: defName }
     ]);
     setActiveSlotIndex(0);
     setSelectedDate(d1);
@@ -344,14 +346,20 @@ export const PublicBooking: React.FC = () => {
           const [h, m] = s.time.split(':').map(Number);
           const startLocal = new Date(s.date);
           startLocal.setHours(h, m, 0, 0);
-          const endLocal = new Date(startLocal.getTime() + selectedService.duration_min * 60000);
+          const sObj = availableServices.find(serv => serv.id === s.serviceId) || selectedService;
+          const duration = sObj?.duration_min || selectedService.duration_min;
+          const endLocal = new Date(startLocal.getTime() + duration * 60000);
 
           const start_time = `${s.date}T${s.time}:00`;
           const end_time = `${s.date}T${String(endLocal.getHours()).padStart(2, '0')}:${String(
             endLocal.getMinutes()
           ).padStart(2, '0')}:00`;
 
-          return { start_time, end_time };
+          return { 
+            start_time, 
+            end_time, 
+            service_id: s.serviceId || selectedService.id 
+          };
         });
 
         const { error } = await createMonthlyPackageAppointments({
@@ -987,6 +995,34 @@ export const PublicBooking: React.FC = () => {
                         )}
                       </div>
 
+                      {/* Seleção do Tipo de Serviço / Ordem dos Cortes */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-wider text-amber-500 px-1 flex items-center gap-1.5">
+                          <Scissors size={12} /> Tipo de Serviço do {activeSlotIndex + 1}º Corte:
+                        </label>
+                        <select
+                          className="w-full bg-neutral-950 border border-amber-500/30 p-3.5 rounded-2xl text-white font-bold text-xs uppercase outline-none focus:border-amber-500 transition-all cursor-pointer"
+                          value={packageSlots[activeSlotIndex]?.serviceId || selectedService?.id || availableServices[0]?.id || 1}
+                          onChange={e => {
+                            const sId = Number(e.target.value);
+                            const serv = availableServices.find(s => s.id === sId);
+                            const updated = [...packageSlots];
+                            updated[activeSlotIndex] = {
+                              ...updated[activeSlotIndex],
+                              serviceId: sId,
+                              serviceName: serv?.name || 'Corte'
+                            };
+                            setPackageSlots(updated);
+                          }}
+                        >
+                          {availableServices.map(s => (
+                            <option key={s.id} value={s.id}>
+                              {s.name} — R$ {Number(s.price).toFixed(2)} ({s.duration_min} min)
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
                       {/* Input do Dia */}
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black uppercase tracking-wider text-neutral-400 px-1">
@@ -1033,7 +1069,9 @@ export const PublicBooking: React.FC = () => {
                                   disabled={isUsedInOtherSlot}
                                   onClick={() => {
                                     const updated = [...packageSlots];
-                                    updated[activeSlotIndex] = { date: selectedDate, time: t };
+                                    const currServId = updated[activeSlotIndex]?.serviceId || selectedService?.id || availableServices[0]?.id || 1;
+                                    const currServName = updated[activeSlotIndex]?.serviceName || selectedService?.name || availableServices[0]?.name || 'Corte';
+                                    updated[activeSlotIndex] = { date: selectedDate, time: t, serviceId: currServId, serviceName: currServName };
                                     setPackageSlots(updated);
 
                                     // Avança automaticamente para o próximo corte vazio
@@ -1085,10 +1123,15 @@ export const PublicBooking: React.FC = () => {
                       </span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         {packageSlots.map((s, i) => (
-                          <div key={i} className={`p-2.5 rounded-xl border flex items-center justify-between ${s.time ? 'bg-neutral-950 border-emerald-500/30 text-white' : 'bg-neutral-950/40 border-neutral-800/60 text-neutral-600'}`}>
-                            <span className="font-bold text-[11px]">{i + 1}º Corte:</span>
+                          <div key={i} className={`p-3 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-1 ${s.time ? 'bg-neutral-950 border-emerald-500/30 text-white' : 'bg-neutral-950/40 border-neutral-800/60 text-neutral-600'}`}>
+                            <div className="flex items-center gap-2">
+                              <span className="font-black text-amber-400 text-xs">{i + 1}º:</span>
+                              <span className="text-[11px] font-bold text-neutral-300 uppercase truncate max-w-[140px]">
+                                {s.serviceName || selectedService?.name || 'Corte'}
+                              </span>
+                            </div>
                             {s.time ? (
-                              <span className="text-amber-400 font-black">
+                              <span className="text-emerald-400 font-black text-xs">
                                 {formatApptDate(`${s.date}T${s.time}:00`).split('(')[0].trim()} às {s.time}
                               </span>
                             ) : (

@@ -222,7 +222,7 @@ export const createMonthlyPackageAppointments = async (packageData: {
   service_name: string;
   professional_id: number;
   professional_name: string;
-  appointments: { start_time: string; end_time: string }[];
+  appointments: { start_time: string; end_time: string; service_id?: number }[];
 }) => {
   try {
     const records = packageData.appointments.map(appt => ({
@@ -230,7 +230,7 @@ export const createMonthlyPackageAppointments = async (packageData: {
       user_name: packageData.user_name,
       user_phone: packageData.user_phone,
       user_email: packageData.user_email || null,
-      service_id: packageData.service_id,
+      service_id: appt.service_id || packageData.service_id,
       professional_id: packageData.professional_id,
       start_time: appt.start_time,
       end_time: appt.end_time,

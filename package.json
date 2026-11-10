@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/server": "^1.9.2",
     "@supabase/supabase-js": "^2.47.10",
     "dotenv": "^18.0.9",
     "express": "^5.3.0",
