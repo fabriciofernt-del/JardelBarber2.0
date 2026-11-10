@@ -359,9 +359,7 @@ export const PublicBooking: React.FC = () => {
           user_phone: clientPhone,
           user_email: clientEmail || undefined,
           service_id: selectedService.id,
-          service_name: selectedService.name,
           professional_id: selectedProfessionalId,
-          professional_name: professional?.name || 'Jardel',
           appointments: appointmentList
         });
 
@@ -401,9 +399,7 @@ export const PublicBooking: React.FC = () => {
         user_phone: clientPhone,
         user_email: clientEmail || undefined,
         service_id: selectedServiceId!,
-        service_name: selectedService.name,
         professional_id: selectedProfessionalId!,
-        professional_name: professional?.name || 'Jardel',
         start_time,
         end_time,
         status: 'pendente' as const,
