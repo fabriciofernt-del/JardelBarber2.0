@@ -201,7 +201,7 @@ export default async function handler(req: any, res: any) {
           user_name: nomeCliente,
           user_phone: telefoneCliente,
           user_email: emailCliente,
-          service_id: Number((slot as any).service_id) || resolvedService.id,
+          service_id: resolvedService.id,
           professional_id: professionalId,
           start_time: startTime,
           end_time: endTime,
