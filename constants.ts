@@ -152,8 +152,8 @@ export const getAppointments = async (): Promise<Appointment[]> => {
   const { data, error } = await supabase
     .from('appointments')
     .select('*')
-    .eq('id_do_inq', TENANT_ID)
-    .order('hora_de_inicio', { ascending: false });
+    .eq('tenant_id', TENANT_ID)
+    .order('start_time', { ascending: false });
 
   if (error) {
     console.warn('Warning fetching appointments:', error.message);
@@ -161,14 +161,14 @@ export const getAppointments = async (): Promise<Appointment[]> => {
   }
   return (data || []).map((row: any) => ({
     id: row.id,
-    tenant_id: row.id_do_inq ?? TENANT_ID,
-    user_name: row.nome_do_usuario || '',
-    user_email: row.email_do_usuario || '',
-    user_phone: row.telefone_do_usuario || '',
-    service_id: row.id_do_servico,
-    professional_id: row.id_do_profissional,
-    start_time: row.hora_de_inicio,
-    end_time: row.hora_final,
+    tenant_id: row.tenant_id ?? TENANT_ID,
+    user_name: row.user_name || '',
+    user_email: row.user_email || '',
+    user_phone: row.user_phone || '',
+    service_id: row.service_id,
+    professional_id: row.professional_id,
+    start_time: row.start_time,
+    end_time: row.end_time,
     status: row.status || 'pendente',
     created_at: row.created_at || new Date().toISOString(),
     receipt_url: row.receipt_url
@@ -200,14 +200,14 @@ export const createAppointment = async (appt: Partial<Appointment>) => {
   // Fallback to direct Supabase insert
   try {
     const dbRecord = {
-      id_do_inq: TENANT_ID,
-      nome_do_usuario: appt.user_name,
-      email_do_usuario: appt.user_email || null,
-      telefone_do_usuario: appt.user_phone,
-      id_do_servico: appt.service_id,
-      id_do_profissional: appt.professional_id,
-      hora_de_inicio: appt.start_time,
-      hora_final: appt.end_time,
+      tenant_id: TENANT_ID,
+      user_name: appt.user_name,
+      user_email: appt.user_email || null,
+      user_phone: appt.user_phone,
+      service_id: appt.service_id,
+      professional_id: appt.professional_id,
+      start_time: appt.start_time,
+      end_time: appt.end_time,
       status: appt.status || 'pendente'
     };
 
@@ -231,14 +231,14 @@ export const createAppointment = async (appt: Partial<Appointment>) => {
 
 export const updateAppointment = async (id: number, updates: Partial<Appointment>) => {
   const dbUpdates: any = {};
-  if (updates.tenant_id !== undefined) dbUpdates.id_do_inq = updates.tenant_id;
-  if (updates.user_name !== undefined) dbUpdates.nome_do_usuario = updates.user_name;
-  if (updates.user_email !== undefined) dbUpdates.email_do_usuario = updates.user_email;
-  if (updates.user_phone !== undefined) dbUpdates.telefone_do_usuario = updates.user_phone;
-  if (updates.service_id !== undefined) dbUpdates.id_do_servico = updates.service_id;
-  if (updates.professional_id !== undefined) dbUpdates.id_do_profissional = updates.professional_id;
-  if (updates.start_time !== undefined) dbUpdates.hora_de_inicio = updates.start_time;
-  if (updates.end_time !== undefined) dbUpdates.hora_final = updates.end_time;
+  if (updates.tenant_id !== undefined) dbUpdates.tenant_id = updates.tenant_id;
+  if (updates.user_name !== undefined) dbUpdates.user_name = updates.user_name;
+  if (updates.user_email !== undefined) dbUpdates.user_email = updates.user_email;
+  if (updates.user_phone !== undefined) dbUpdates.user_phone = updates.user_phone;
+  if (updates.service_id !== undefined) dbUpdates.service_id = updates.service_id;
+  if (updates.professional_id !== undefined) dbUpdates.professional_id = updates.professional_id;
+  if (updates.start_time !== undefined) dbUpdates.start_time = updates.start_time;
+  if (updates.end_time !== undefined) dbUpdates.end_time = updates.end_time;
   if (updates.status !== undefined) dbUpdates.status = updates.status;
 
   const { error } = await supabase.from('appointments').update(dbUpdates).eq('id', id);
@@ -260,14 +260,14 @@ export const createMonthlyPackageAppointments = async (packageData: {
 }) => {
   try {
     const records = packageData.appointments.map(appt => ({
-      id_do_inq: TENANT_ID,
-      nome_do_usuario: packageData.user_name,
-      telefone_do_usuario: packageData.user_phone,
-      email_do_usuario: packageData.user_email || null,
-      id_do_servico: packageData.service_id,
-      id_do_profissional: packageData.professional_id,
-      hora_de_inicio: appt.start_time,
-      hora_final: appt.end_time,
+      tenant_id: TENANT_ID,
+      user_name: packageData.user_name,
+      user_phone: packageData.user_phone,
+      user_email: packageData.user_email || null,
+      service_id: packageData.service_id,
+      professional_id: packageData.professional_id,
+      start_time: appt.start_time,
+      end_time: appt.end_time,
       status: 'pendente'
     }));
 

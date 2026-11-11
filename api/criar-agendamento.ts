@@ -197,14 +197,14 @@ export default async function handler(req: any, res: any) {
         }
 
         return {
-          id_do_inq: tenantId,
-          nome_do_usuario: nomeCliente,
-          telefone_do_usuario: telefoneCliente,
-          email_do_usuario: emailCliente,
-          id_do_servico: resolvedService.id,
-          id_do_profissional: professionalId,
-          hora_de_inicio: startTime,
-          hora_final: endTime,
+          tenant_id: tenantId,
+          user_name: nomeCliente,
+          user_phone: telefoneCliente,
+          user_email: emailCliente,
+          service_id: resolvedService.id,
+          professional_id: professionalId,
+          start_time: startTime,
+          end_time: endTime,
           status: 'pendente'
         };
       });
@@ -324,14 +324,14 @@ export default async function handler(req: any, res: any) {
 
     // Filtrar apenas campos aceitos na tabela appointments
     const appointmentRecord = {
-      id_do_inq: tenantId,
-      nome_do_usuario: nomeCliente,
-      telefone_do_usuario: telefoneCliente,
-      email_do_usuario: emailCliente,
-      id_do_servico: resolvedService.id,
-      id_do_profissional: professionalId,
-      hora_de_inicio: startTime,
-      hora_final: endTime,
+      tenant_id: tenantId,
+      user_name: nomeCliente,
+      user_phone: telefoneCliente,
+      user_email: emailCliente,
+      service_id: resolvedService.id,
+      professional_id: professionalId,
+      start_time: startTime,
+      end_time: endTime,
       status: dados.status || 'pendente'
     };
 
