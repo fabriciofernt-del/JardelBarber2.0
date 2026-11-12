@@ -21,7 +21,7 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 
 const EMAIL_DESTINO = 
   process.env.EMAIL_DESTINO || 
-  'contato@barbeariadojardel.com.br';
+  'jardeldssbarbeiro@gmail.com';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false }

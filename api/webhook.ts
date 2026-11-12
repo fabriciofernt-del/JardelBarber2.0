@@ -5,7 +5,7 @@ dotenv.config({ path: '.env.local', override: true });
 dotenv.config({ override: true });
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
-const EMAIL_DESTINO = process.env.EMAIL_DESTINO || 'contato@barbeariadojardel.com.br';
+const EMAIL_DESTINO = process.env.EMAIL_DESTINO || 'jardeldssbarbeiro@gmail.com';
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
