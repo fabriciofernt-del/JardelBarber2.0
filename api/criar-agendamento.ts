@@ -210,10 +210,12 @@ export default async function handler(req: any, res: any) {
       });
 
       // 1. Salvar os 4 agendamentos no Supabase
+      console.log('>>> [criar-agendamento] ANTES DO INSERT (Pacote):', JSON.stringify(recordsToInsert, null, 2));
       const { data: insertedData, error: insertError } = await supabase
         .from('appointments')
         .insert(recordsToInsert)
         .select();
+      console.log('<<< [criar-agendamento] DEPOIS DO INSERT (Pacote) - error:', insertError, 'data count:', insertedData?.length);
 
       if (insertError) {
         console.error('Erro ao salvar os 4 agendamentos no Supabase:', insertError);
@@ -336,11 +338,13 @@ export default async function handler(req: any, res: any) {
     };
 
     // 1. Salvar no Supabase
+    console.log('>>> [criar-agendamento] ANTES DO INSERT (Avulso):', JSON.stringify(appointmentRecord, null, 2));
     const { data: singleData, error: singleError } = await supabase
       .from('appointments')
       .insert([appointmentRecord])
       .select()
       .single();
+    console.log('<<< [criar-agendamento] DEPOIS DO INSERT (Avulso) - error:', singleError, 'data:', singleData);
 
     if (singleError) {
       console.error('Erro ao salvar agendamento avulso no Supabase:', singleError);

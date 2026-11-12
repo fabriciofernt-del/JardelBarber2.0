@@ -1271,9 +1271,11 @@ export const PublicBooking: React.FC = () => {
                     </div>
                     <input 
                       type="email" 
-                      placeholder="Seu E-mail (opcional - para receber a confirmação)" 
+                      placeholder="Seu E-mail (opcional)" 
                       value={clientEmail} 
                       onChange={e => setClientEmail(e.target.value)} 
+                      autoComplete="off"
+                      name="email_client"
                       className="w-full bg-neutral-900 border border-neutral-800 p-5 pl-14 rounded-2xl text-white font-bold outline-none focus:border-amber-500 focus:bg-neutral-950 transition-all placeholder:text-neutral-700 italic" 
                     />
                   </div>
@@ -1376,7 +1378,7 @@ export const PublicBooking: React.FC = () => {
                   </p>
                   <div className="h-px bg-neutral-800/80 my-2"></div>
                   <p className="text-[10px] font-black text-amber-400 leading-normal uppercase tracking-wider">
-                    ATENÇÃO: Você <span className="text-white underline font-black">DEVE</span> clicar no botão <span className="text-white font-black">"CONFIRMAR AGENDAMENTO"</span> abaixo para salvar o(s) horário(s) e disparar o e-mail de confirmação!
+                    Dica: Clique no botão <span className="text-white font-black">"Confirmar Agendamento"</span> abaixo para concluir a sua reserva e garantir o horário selecionado.
                   </p>
                 </div>
                 
@@ -1386,7 +1388,7 @@ export const PublicBooking: React.FC = () => {
                   className="w-full py-7 bg-amber-500 text-black font-black rounded-[3rem] uppercase tracking-[0.2em] italic shadow-[0_20px_40px_-10px_rgba(245,158,11,0.3)] hover:bg-amber-400 transition-all active:scale-95 active:shadow-none text-sm"
                 >
                   {submitting 
-                    ? (isMonthlyPackage(selectedService?.name) ? 'SALVANDO 4 HORÁRIOS & ENVIANDO E-MAIL...' : 'SALVANDO HORÁRIO & ENVIANDO E-MAIL...') 
+                    ? (isMonthlyPackage(selectedService?.name) ? 'PROCESSANDO SEUS 4 HORÁRIOS...' : 'PROCESSANDO SUA RESERVA...') 
                     : 'CONFIRMAR AGENDAMENTO'}
                 </button>
               </div>
@@ -1407,12 +1409,12 @@ export const PublicBooking: React.FC = () => {
                   <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest max-w-sm mx-auto leading-relaxed">
                     {selectedService && isMonthlyPackage(selectedService.name) ? (
                       <>
-                        Seus <span className="text-amber-400 font-black">4 cortes</span> foram agendados e salvos no sistema. <br />
-                        O e-mail de confirmação com todas as datas foi enviado via Resend!
+                        Seus <span className="text-amber-400 font-black">4 horários</span> foram reservados com sucesso. <br />
+                        Enviamos os detalhes do seu pacote para o seu e-mail cadastrado!
                       </>
                     ) : (
                       <>
-                        Seu horário foi reservado no sistema e o e-mail de confirmação foi disparado via Resend! <br /> Te esperamos na barbearia.
+                        Seu horário foi reservado com sucesso! <br /> Um e-mail de confirmação foi enviado. Te esperamos na barbearia.
                       </>
                     )}
                   </p>
