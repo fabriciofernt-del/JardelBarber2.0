@@ -259,6 +259,32 @@ export const createMonthlyPackageAppointments = async (packageData: {
   appointments: { start_time: string; end_time: string }[];
 }) => {
   try {
+    const response = await fetch('/api/criar-agendamento', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        ...packageData, 
+        tenant_id: TENANT_ID,
+        is_monthly_package: true 
+      }),
+    });
+    
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const result = await response.json();
+      if (response.ok) {
+        return { error: null, data: result.data };
+      }
+      console.warn('API /api/criar-agendamento error for package, falling back to direct Supabase insert:', result);
+    }
+  } catch (err: any) {
+    console.warn('Could not reach /api/criar-agendamento for package, falling back to direct Supabase insert:', err);
+  }
+
+  // Fallback to direct Supabase insert
+  try {
     const records = packageData.appointments.map(appt => ({
       tenant_id: TENANT_ID,
       user_name: packageData.user_name,
@@ -277,8 +303,8 @@ export const createMonthlyPackageAppointments = async (packageData: {
       .select();
 
     if (error) {
-      console.error('Erro ao criar pacote mensal:', error);
-      return { error };
+      console.error('Erro direto Supabase ao criar pacote mensal:', error);
+      return { error: new Error(error.message || 'Erro ao salvar pacote mensal') };
     }
 
     return { error: null, data };
